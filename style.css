@@ -1,0 +1,134 @@
+/* * 1. 全体設定 
+ */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #7b5832; /* 土っぽい背景色 */
+    color: #4b3014; /* 砂や土に書かれた文字のような色 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    user-select: none; /* タッチ操作で選択させない */
+    /* iOSデバイスなどでスクロールによるズームを防ぐ */
+    touch-action: manipulation; 
+}
+
+/*
+ * 2. ゲームコンテナ (3D視点の基準)
+ */
+#game-container {
+    background-color: #f7e0b5; /* 古い紙や日焼けした地面のような色 */
+    border: 5px solid #4b3014;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px rgba(75, 48, 20, 0.5); /* 影で立体感とレトロ感を出す */
+    max-width: 400px;
+    width: 100%;
+    
+    /* ★追加: 3D変換の遠近感（視点）を設定 */
+    perspective: 1000px; 
+}
+
+/*
+ * 3. ボードコンテナ (回転させる要素)
+ */
+#board-container {
+    position: relative;
+    width: 300px; /* 300x300のボード */
+    height: 300px;
+    margin: 20px auto;
+    
+    /* ★追加: 3D回転を滑らかにするための設定 */
+    transition: transform 0.5s ease-out; 
+    transform-style: preserve-3d; /* 子要素（キャンバスやセル）も一緒に3D空間で動くようにする */
+}
+
+/*
+ * 4. タイトル
+ */
+h1 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+/*
+ * 5. マス目 (クリック判定用)
+ */
+.cell {
+    position: absolute;
+    width: 33.33%;
+    height: 33.33%;
+    z-index: 10; /* キャンバスより上に配置してタッチイベントを受け付ける */
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* グリッドレイアウトで位置を決定 */
+.cell[data-index="0"], .cell[data-index="1"], .cell[data-index="2"] { top: 0; }
+.cell[data-index="3"], .cell[data-index="4"], .cell[data-index="5"] { top: 33.33%; }
+.cell[data-index="6"], .cell[data-index="7"], .cell[data-index="8"] { top: 66.66%; }
+
+.cell[data-index="0"], .cell[data-index="3"], .cell[data-index="6"] { left: 0; }
+.cell[data-index="1"], .cell[data-index="4"], .cell[data-index="7"] { left: 33.33%; }
+.cell[data-index="2"], .cell[data-index="5"], .cell[data-index="8"] { left: 66.66%; }
+
+
+/*
+ * 6. キャンバス (背景と線描画)
+ */
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    background: repeating-linear-gradient(
+        45deg,
+        #f7e0b5,
+        #f7e0b5 10px,
+        #e9d1a3 10px,
+        #e9d1a3 20px
+    ); /* 地面に引かれた雑な線のようなテクスチャ */
+    border-radius: 5px;
+    
+    /* ★修正: 反転時のシンボル描画が崩れないよう、逆回転をかけて調整（必須ではありませんが安全のため） */
+    backface-visibility: hidden; 
+}
+
+/*
+ * 7. メッセージとボタン
+ */
+#message {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #cc0000; /* 赤インクのような色 */
+}
+
+#restart-button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    font-size: 1em;
+    background-color: #a30000;
+    color: white;
+    border: 3px solid #7b0000;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #7b0000;
+    transition: all 0.1s;
+}
+
+#restart-button:active {
+    box-shadow: none;
+    transform: translate(2px, 2px);
+}
+
+.hidden {
+    display: none;
+}
