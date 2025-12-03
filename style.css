@@ -29,8 +29,6 @@ body {
     max-width: 400px;
     width: 100%;
     
-    /* ★追加: 3D変換の遠近感（視点）を設定 */
-    perspective: 1000px; 
 }
 
 /*
@@ -42,9 +40,6 @@ body {
     height: 300px;
     margin: 20px auto;
     
-    /* ★追加: 3D回転を滑らかにするための設定 */
-    transition: transform 0.5s ease-out; 
-    transform-style: preserve-3d; /* 子要素（キャンバスやセル）も一緒に3D空間で動くようにする */
 }
 
 /*

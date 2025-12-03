@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restart-button');
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
-    const boardContainer = document.getElementById('board-container'); // ボードのコンテナを取得
 
     // キャンバスのサイズを親要素に合わせる
+    const boardContainer = document.getElementById('board-container');
     canvas.width = 300; // CSSで設定したサイズ
     canvas.height = 300;
     
@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
         [0, 4, 8], [2, 4, 6]             // 斜め
     ];
 
-    // マス目の境界線を描画
+    // マス目の境界線を描画（レトロな雰囲気を出すために雑に描く）
     function drawGrid() {
-        ctx.strokeStyle = '#4b3014'; 
-        ctx.lineWidth = 5; 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+        ctx.strokeStyle = '#4b3014'; // 土に描いた線のような色
+        ctx.lineWidth = 5; // 太めの線
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // 一旦クリア
 
         // 縦線
         ctx.beginPath();
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const x = col * cellSize + cellSize / 2;
         const y = row * cellSize + cellSize / 2;
         
-        ctx.strokeStyle = symbol === 'O' ? '#cc0000' : '#006600'; 
+        ctx.strokeStyle = symbol === 'O' ? '#cc0000' : '#006600'; // Oは赤、Xは緑
         ctx.lineWidth = 10;
         
         if (symbol === 'O') {
@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (roundWon) {
+            // ★勝利メッセージを「Oの勝ち」「Xの勝ち」に変更
             messageDisplay.textContent = `${currentPlayer} の勝ち`;
             gameActive = false;
         } else if (!board.includes(null)) {
@@ -141,60 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         restartButton.classList.remove('hidden');
     }
 
-    // =========================================================
-    // ジャイロセンサーによる上下反転処理
-    // =========================================================
-    let isFlipped = false;
-
-    function handleOrientation(event) {
-        // gamma: 左右への傾き (Y軸周り)
-        // beta: 前後への傾き (X軸周り) -> これを使って上下反転を判定
-        const beta = event.beta; 
-        
-        // 縦向きデバイスを想定。betaが60度以上（手前にかなり傾いている）で反転させる
-        if (beta > 60 && !isFlipped) {
-            // 上下反転（X軸周りに180度回転）
-            boardContainer.style.transform = 'rotateX(180deg)';
-            messageDisplay.textContent = `ボードを反転しました！次は ${currentPlayer} の番です。`;
-            isFlipped = true;
-        } else if (beta < 30 && isFlipped) {
-            // 垂直に戻ったら、反転を解除
-            boardContainer.style.transform = 'rotateX(0deg)';
-            messageDisplay.textContent = `ボードを元に戻しました。次は ${currentPlayer} の番です。`;
-            isFlipped = false;
-        }
-        
-        // メッセージを常に更新すると煩わしいので、ジェスチャー中は傾きメッセージは出さない
-        if (gameActive && !isDrawing) {
-             messageDisplay.textContent = `次は ${currentPlayer} の番！指で描いてね。`;
-        }
-    }
-
-    // センサーイベントリスナーを設定
-    if (window.DeviceOrientationEvent) {
-        // センサーアクセス許可が必要なiOS 13+などに対応するためのチェック
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            document.getElementById('game-container').addEventListener('click', () => {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                        } else {
-                            // 許可が得られなかった場合
-                            console.log('ジャイロセンサーのアクセスが拒否されました。');
-                        }
-                    })
-                    .catch(console.error);
-            }, { once: true }); // 一度だけ実行されるように設定
-        } else {
-            // 許可が不要な環境（Androidなど）
-            window.addEventListener('deviceorientation', handleOrientation);
-        }
-    } else {
-        // センサー非対応デバイス
-        console.log('お使いのデバイスはジャイロセンサーに対応していません。');
-    }
-    
     // =========================================================
     // ジェスチャー描画・認識ロジック
     // =========================================================
